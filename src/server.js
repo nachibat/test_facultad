@@ -1,9 +1,17 @@
 require('./config/general');
 
+const fs = require('fs');
+const https = require('https');
+
 const db = require('./config/database');
 
 const express = require('express');
 const cors = require('cors');
+
+const ssl_options = {
+    key: fs.readFileSync('./server.key'),
+    cert: fs.readFileSync('./server.crt')
+}
 
 const app = express();
 
@@ -36,5 +44,7 @@ if (process.env.NODE_ENV === 'dev') {
         console.log(`Listening on port ${process.env.PORT}...`);
     });
 } else {
-    console.log('Configurar el servidor https');
+    https.createServer(ssl_options, app).listen(process.env.SECURE_PORT, () => {
+        console.log(`Listening on port ${process.env.SECURE_PORT}...`);
+    });
 }
